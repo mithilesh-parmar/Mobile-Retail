@@ -10,23 +10,25 @@ import java.util.UUID;
 
 public class Invoice {
 
-	private Customer customer;
-	private Organization organization;
-	private List<Order> orderList;
-	private UUID id;
-	private int invoiceNumber;
-	private LocalDate date;
-	private PaymentMode paymentMode;
+	private Customer customer; // customer
+	private Organization organization; // company
+	private List<Order> orderList; // orders for the customer
+	private UUID id; // id of invoice
+	private int invoiceNumber; // invoice number
+	private LocalDate date; // date of issue
+	private PaymentMode paymentMode; // payment mode for purchase
 
 	public Invoice(Customer customer, List<Order> orderList, int invoiceNumber, PaymentMode paymentMode) {
-		id = UUID.randomUUID();
-		date = LocalDate.now();
+		id = UUID.randomUUID(); // set a random id
+		date = LocalDate.now(); // set the local date
 		this.customer = customer;
 		this.organization = Organization.getInstance();
 		this.orderList = orderList;
 		this.invoiceNumber = invoiceNumber;
 		this.paymentMode = paymentMode;
 	}
+
+	// getters and setters
 
 	public Customer getCustomer() {
 		return customer;

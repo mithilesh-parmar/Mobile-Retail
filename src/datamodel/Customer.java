@@ -3,18 +3,20 @@ package datamodel;
 import java.util.UUID;
 
 public class Customer {
+	// properties
 	private UUID id;
 	private String name;
 	private String mobileNumber;
 	private String address;
 
 	public Customer(String name, String mobileNumber, String address) {
-		id = UUID.randomUUID();
+		id = UUID.randomUUID(); // set a random id
 		this.name = name;
 		this.mobileNumber = mobileNumber;
 		this.address = address;
 	}
 
+	// getters and setters
 	public UUID getId() {
 		return id;
 	}

@@ -1,6 +1,8 @@
 package datamodel;
 
 public class Organization {
+
+	// properties
 	private String name;
 	private String address;
 	private String proprietorName;

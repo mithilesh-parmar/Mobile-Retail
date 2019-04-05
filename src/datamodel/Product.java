@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class Product {
 
+	// properties
 	private String manufacturer;
 	private String model;
 	private String imeiNumber;
@@ -11,7 +12,7 @@ public class Product {
 	private float rate;
 
 	public Product(String manufacturer, String model, String iemiNumber, float rate) {
-		id = UUID.randomUUID();
+		id = UUID.randomUUID(); // set a random id
 		this.manufacturer = manufacturer;
 		this.model = model;
 		this.imeiNumber = iemiNumber;
@@ -21,6 +22,8 @@ public class Product {
 	public Product() {
 
 	}
+
+	// getters and setters
 
 	public String getManufacturer() {
 		return manufacturer;
@@ -39,6 +42,7 @@ public class Product {
 	}
 
 	public String getImeiNumber() {
+		System.out.println("Returning iemi:  "+imeiNumber);
 		return imeiNumber;
 	}
 
@@ -64,7 +68,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return manufacturer + "\n" + model;
+		return  manufacturer + " " + model + " \n" + imeiNumber ;
 	}
 
 	@Override
@@ -73,4 +77,6 @@ public class Product {
 		System.out.println(p);
 		return super.equals(obj);
 	}
+
+
 }

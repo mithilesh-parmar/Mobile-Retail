@@ -1,0 +1,60 @@
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+
+<BorderPane fx:controller="homepage.Controller"
+            xmlns:fx="http://javafx.com/fxml" >
+
+
+    <left>
+
+        <ListView fx:id="itemsList" onMouseClicked="#onItemsListClicked" onKeyPressed="#onItemsListPressed"/>
+
+    </left>
+
+    <center>
+
+        <TableView fx:id="invoiceTable">
+
+            <columns>
+
+                <TableColumn text="Product">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="manufacturer"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+                <TableColumn text="Model">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="model"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+                <TableColumn text="Quantity">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="quantity"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+                <TableColumn text="Rate">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="rate"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+                <TableColumn text="Amount">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="amount"/>
+                    </cellValueFactory>
+                </TableColumn>
+
+            </columns>
+
+        </TableView>
+
+    </center>
+
+</BorderPane>
