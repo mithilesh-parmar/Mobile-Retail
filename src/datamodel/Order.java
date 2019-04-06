@@ -100,9 +100,8 @@ public class Order {
 		this.p = p;
 	}
 
-	public Order increaseQuantityByOne(){
+	public void increaseQuantityByOne(){
 		setQuantity(this.quantity.getValue() + 1);
-		return this;
 	}
 
 	public void decreaseQuantityByOne(){

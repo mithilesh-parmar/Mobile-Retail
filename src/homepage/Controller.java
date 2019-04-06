@@ -4,7 +4,9 @@ import datamodel.PaymentMode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -12,7 +14,12 @@ import javafx.scene.input.MouseEvent;
 import datamodel.Order;
 import datamodel.Product;
 import datamodel.Repository;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import utils.Animations;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,6 +41,12 @@ public class Controller implements Initializable {
 	public Label totalLabel;
 	public Label gstLabel;
 	public Label totalPayableLabel;
+	public Button homeButton;
+	public Button inventoryButton;
+	public Button reportsButton;
+	public Button exitButton;
+	public BorderPane mainBorderPane;
+	public HBox mainPage;
 	private Repository repository = Repository.getInstance(); // repo singleton instance
 
 
@@ -55,7 +68,31 @@ public class Controller implements Initializable {
 		printButton.setOnAction(event -> confirmOrder()); // add handler
 		clearButton.setOnAction(event -> clearOrder()); // add handler
 
+		homeButton.setOnAction(event -> changePageTo(mainPage));
+
+		inventoryButton.setOnAction(event -> {
+			try {
+				changePageTo(FXMLLoader.load(getClass().getResource("/inventory/inventory.fxml")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+
+		reportsButton.setOnAction(event -> changePageTo(null));
+		exitButton.setOnAction(event -> closeProgram());
+
+
 	}
+
+
+	private void changePageTo(Node node){
+		mainBorderPane.setCenter(node);
+	}
+
+	private void closeProgram() {
+
+	}
+
 
 	/**
 	 * called for filtering the observable list to show only those products that
@@ -221,5 +258,53 @@ public class Controller implements Initializable {
 			itemsList.requestFocus();
 	}
 
+	/**
+	 * on key pressed in tableview
+	 * shift focus to listview on left key pressed
+	 * remove order on backspace pressed
+	 * @param keyEvent
+	 */
+	public void onTableKeyPressed(KeyEvent keyEvent) {
+		KeyCode keyCode = keyEvent.getCode();
+		if (keyCode == KeyCode.BACK_SPACE){
+			// delete the order from invoice table
+			repository.removeOrder(invoiceTable.getSelectionModel().getSelectedItem());
+		}else if (keyCode == KeyCode.LEFT){
+			// shift the focus to listview
+			if (!itemsList.isFocused()) itemsList.requestFocus();
+		}else if (keyCode == KeyCode.ADD || keyCode == KeyCode.PLUS){
+			// increase the quantity by one
+			repository.increaseTheQuantityByOne(invoiceTable.getSelectionModel().getSelectedItem());
+		}else if (keyCode == KeyCode.MINUS || keyCode == KeyCode.SUBTRACT){
+			// decrease the quantity by one
+			Order order = invoiceTable.getSelectionModel().getSelectedItem();
+			if (order.getQuantity() == 1){
+				invoiceTable.getItems().remove(order);
+			}
+			repository.decreaseTheQuantityByOne(order);
+		}
+	}
+
+	/**
+	 * handles the animation for sidebar
+	 * @param mouseEvent
+	 */
+	public void handleOnMouseEntered(MouseEvent mouseEvent) {
+		HBox view = (HBox)mouseEvent.getSource();
+		Pane indicatorPane = (Pane) view.getChildren().get(0);
+		indicatorPane.setStyle("-fx-background-color:derive(red,70%);");
+		Animations.makeButtonOutAnimations(50,view);
+	}
+
+	/**
+	 * handles the animation for sidebar
+	 * @param mouseEvent
+	 */
+	public void handleOnMouseExited(MouseEvent mouseEvent) {
+		HBox view = (HBox)mouseEvent.getSource();
+		Pane indicatorPane = (Pane) view.getChildren().get(0);
+		indicatorPane.setStyle("-fx-background-color:#2d3041;");
+		Animations.makeButtonInAnimations(50,view);
+	}
 
 }

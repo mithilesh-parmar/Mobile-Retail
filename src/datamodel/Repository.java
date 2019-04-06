@@ -54,6 +54,12 @@ public class Repository {
 	}
 
 	/**
+	 * remove product from database
+	 * @param p
+	 */
+	public void removeProductFromDatabase(Product p){productDao.removeProductFromDatabase(p);}
+
+	/**
 	 * private constructor
 	 * initialize lists and dao
 	 */
@@ -74,7 +80,47 @@ public class Repository {
 	public void addOrder(Order p){
 		if (ordersList.contains(p)) ordersList.get(ordersList.indexOf(p)).increaseQuantityByOne();
 		else ordersList.add(p);
-		setTotalAmount(p.getAmount());
+		setTotalAmount(totalAmount.getValue()+p.getAmount());
+	}
+
+	/**
+	 * increase the quantity of order by one
+	 * @param o
+	 */
+	public void increaseTheQuantityByOne(Order o){
+		o.increaseQuantityByOne();
+		setTotalAmount(totalAmount.getValue() + o.getP().getRate());
+	}
+
+	/**
+	 * decrease the quantity of order by one
+	 * @param o
+	 */
+	public void decreaseTheQuantityByOne(Order o){
+		o.decreaseQuantityByOne();
+		setTotalAmount(totalAmount.getValue() - o.getP().getRate());
+	}
+
+	/**
+	 * add product to database and the product list
+	 * called when product is added from inventory tab
+	 * @param p
+	 */
+
+	public void addProductToInventory(Product p){
+		productList.add(p);
+		saveProductToDatabase(p);
+	}
+
+	/**
+	 * remove product from database
+	 * called when product is removed from inventory table
+	 *
+	 * @param p
+	 */
+	public void removeProductFromInventroy(Product p) {
+		productList.remove(p);
+		removeProductFromDatabase(p);
 	}
 
 	/**
@@ -86,7 +132,7 @@ public class Repository {
 
 	private void setTotalAmount(float amount){
 		// set the totalamount to previous plus the
-		totalAmount.set(totalAmount.getValue() + amount);
+		totalAmount.set(amount);
 		float gst = getGSTPercentage(); // get the gst percentage
 		float gstAmount = (gst / 100) * totalAmount.getValue(); // calculate gst amount
 		float value = totalAmount.getValue() + gstAmount;  // add gstamount to totalamount
@@ -104,8 +150,10 @@ public class Repository {
 	 * remove order form tableview on backspace press
 	 * @param p
 	 */
-	public void removeOrder(Product p){
+	public void removeOrder(Order p){
 		ordersList.remove(p);
+		// change the total amount
+		setTotalAmount(totalAmount.getValue() - p.getAmount());
 	}
 
 	/**
@@ -165,4 +213,6 @@ public class Repository {
 	public Number getTotalPayableAmount() {
 		return totalPayableAmount.get();
 	}
+
+
 }
