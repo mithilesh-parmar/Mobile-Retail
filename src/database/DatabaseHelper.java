@@ -74,16 +74,19 @@ public abstract class DatabaseHelper {
 
 	/**
 	 * used to execute query (drop statement)
+	 *
+	 * @param s
 	 * @param query
 	 * @return
 	 */
-	public static int executeQuery(String query){
-		Statement statement = null;
+	public static int executeQuery(String query, String parameter){
+		PreparedStatement statement = null;
 		int result =0;
 		try{
 			connectDatabase(); // connect to database
-			statement = connection.createStatement();
-			result = statement.executeUpdate(query);
+			statement = connection.prepareStatement(query);
+			statement.setString(1,parameter);
+			result = statement.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally {

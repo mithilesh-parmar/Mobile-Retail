@@ -71,8 +71,8 @@ public class ProductDao implements EntityInterface {
 	 * @param product to be removed
 	 */
 	public void removeProductFromDatabase(Product product){
-		String query = "DELETE FROM  "+TABLE_NAME +" WHERE "+COLUMNS.ID + " == " + product.getId().toString();
-		DatabaseHelper.executeQuery(query);
+		String query = "DELETE FROM  "+TABLE_NAME +" WHERE "+COLUMNS.ID + " = (?)";
+		DatabaseHelper.executeQuery(query,product.getId().toString());
 	}
 
 	/**

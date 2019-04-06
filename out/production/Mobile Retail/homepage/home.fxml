@@ -10,14 +10,9 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-
-
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.control.Tooltip?>
 
@@ -134,53 +129,53 @@
                     <!--Name input -->
                     <!--(0,1)-->
                     <Label text="Name" GridPane.rowIndex="0"/>
-                    <TextField fx:id="nameTextField" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT"/>
+                    <TextField fx:id="nameTextField" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Phone number input-->
                     <!--(1,1)-->
                     <Label text="Phone Number" GridPane.rowIndex="1" />
-                    <TextField fx:id="phoneNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="RIGHT"/>
+                    <TextField fx:id="phoneNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Address Input-->
                     <!--(2,1)-->
                     <Label text="Address" GridPane.rowIndex="2" />
-                    <TextField fx:id="addressTextField" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="RIGHT"/>
+                    <TextField fx:id="addressTextField" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Payment Mode-->
                     <!--(0,3)-->
                     <Label text="Payment Mode" GridPane.rowIndex="0" GridPane.columnIndex="3" GridPane.halignment="RIGHT"/>
                     <!--(0,4)-->
-                    <ComboBox fx:id="paymentModeComboBox" GridPane.rowIndex="0" GridPane.columnIndex="4" GridPane.halignment="RIGHT"/>
+                    <ComboBox fx:id="paymentModeComboBox" GridPane.rowIndex="0" GridPane.columnIndex="4" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Invoice Number-->
                     <!--(1,3)-->
                     <Label text="Invoice Number : " GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.halignment="RIGHT"/>
                     <!--(1,4)-->
-                    <Label fx:id="invoiceNumberLabel" text="21" GridPane.rowIndex="1" GridPane.columnIndex="4" GridPane.halignment="RIGHT"/>
+                    <Label fx:id="invoiceNumberLabel" text="21" GridPane.rowIndex="1" GridPane.columnIndex="4" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Date-->
                     <!--(2,3)-->
                     <Label text="Date: " GridPane.rowIndex="2" GridPane.columnIndex="3" GridPane.halignment="RIGHT" />
                     <!--(2,4)-->
-                    <Label fx:id="dateLabel"  GridPane.rowIndex="2" GridPane.columnIndex="4" GridPane.halignment="RIGHT"/>
+                    <Label fx:id="dateLabel"  GridPane.rowIndex="2" GridPane.columnIndex="4" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--Total Amount-->
                     <!--(0,5)-->
                     <Label text="Total: " GridPane.rowIndex="0" GridPane.columnIndex="5" GridPane.halignment="RIGHT"/>
                     <!--(0,6)-->
-                    <Label fx:id="totalLabel" GridPane.rowIndex="0" GridPane.columnIndex="6" GridPane.halignment="RIGHT"/>
+                    <Label fx:id="totalLabel" GridPane.rowIndex="0" GridPane.columnIndex="6" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--GST-->
                     <!--(1,5)-->
                     <Label text="GST: " GridPane.rowIndex="1" GridPane.columnIndex="5" GridPane.halignment="RIGHT"/>
                     <!--(1,6)-->
-                    <Label fx:id="gstLabel" GridPane.rowIndex="1" GridPane.columnIndex="6" GridPane.halignment="RIGHT"/>
+                    <Label fx:id="gstLabel" GridPane.rowIndex="1" GridPane.columnIndex="6" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
                     <!--TOTAL PAYABLE-->
                     <!--(2,5)-->
                     <Label text="Total Payable: " GridPane.rowIndex="2" GridPane.columnIndex="5" GridPane.halignment="RIGHT"/>
                     <!--(2,6)-->
-                    <Label fx:id="totalPayableLabel" GridPane.rowIndex="2" GridPane.columnIndex="6" GridPane.halignment="RIGHT"/>
+                    <Label fx:id="totalPayableLabel" GridPane.rowIndex="2" GridPane.columnIndex="6" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
                 </GridPane>
 
                 <!--Table view orders (Center view)-->
@@ -199,6 +194,12 @@
                         <TableColumn text="Model">
                             <cellValueFactory>
                                 <PropertyValueFactory property="model"/>
+                            </cellValueFactory>
+                        </TableColumn>
+
+                        <TableColumn text="IEMI NUMBER">
+                            <cellValueFactory>
+                                <PropertyValueFactory property="imeiNumber"/>
                             </cellValueFactory>
                         </TableColumn>
 
@@ -231,17 +232,18 @@
 
                     <!--print button-->
                     <Button fx:id="printButton"
-                            text="Print">
+                            text="_Print">
                         <graphic>
                             <ImageView>
                                 <Image url="/res/print_icon.png"/>
                             </ImageView>
                         </graphic>
+
                     </Button>
 
                     <!--Clear button-->
                     <Button fx:id="clearButton"
-                            text="Clear">
+                            text="_Clear">
                         <graphic>
                             <ImageView>
                                 <Image url="/res/clear_icon.png"/>

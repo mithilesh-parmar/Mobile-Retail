@@ -2,6 +2,7 @@ package inventory;
 
 import datamodel.Product;
 import datamodel.Repository;
+import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
@@ -23,15 +24,23 @@ public class InventoryController implements Initializable {
 	public TextField rateTextField;
 	public Button addButton;
 	public TextField iemiNumberTextField;
+	public TableColumn columnManufacturer;
+	public TableColumn columnModel;
+	public TableColumn columnIEMINumber;
+	public TableColumn columnRate;
 	private Repository repository = Repository.getInstance();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		repository.loadProducts();
-		inventoryTable.setItems(repository.getProductList());
-		addButton.setOnAction(event -> addProductToDatabase());
+		inventoryTable.setItems(repository.getProductList()); // show all available products in table
+		addButton.setOnAction(event -> addProductToDatabase()); // add event handler
 	}
 
+	/**
+	 * add product to database
+	 * extract info from textfields
+	 * then add it to database
+	 */
 	private void addProductToDatabase() {
 		if (isTextPresent(manufacturerTextField) &&
 				isTextPresent(modelTextField) &&
@@ -47,18 +56,35 @@ public class InventoryController implements Initializable {
 		}
 	}
 
+	/**
+	 * remove product from database
+	 */
 	public void removeProductFromDatabase(){
 		repository.removeProductFromDatabase(inventoryTable.getSelectionModel().getSelectedItem());
 	}
 
+	/**
+	 * helper function to check if text is present in textfield
+	 * @param textField
+	 * @return
+	 */
 	private boolean isTextPresent(TextField textField){
 		return textField.getText().length() > 0;
 	}
 
+	/**
+	 * helper function to get string from textfield
+	 * @param textField
+	 * @return
+	 */
 	private String getText(TextField textField){
 		return textField.getText();
 	}
 
+	/**
+	 * clear textfields
+	 * called after order is confirmed
+	 */
 	private void clearTextFields(){
 		manufacturerTextField.clear();
 		modelTextField.clear();
@@ -67,6 +93,10 @@ public class InventoryController implements Initializable {
 	}
 
 
+	/**
+	 * on pressing backspace remove product from database
+	 * @param keyEvent
+	 */
 	public void onInventoryTableKeyPressed(KeyEvent keyEvent) {
 		KeyCode keyCode = keyEvent.getCode();
 		if (keyCode == KeyCode.BACK_SPACE){

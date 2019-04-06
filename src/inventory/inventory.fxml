@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
+
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="inventory.InventoryController"
@@ -53,6 +49,7 @@
             <!--(4,0)-->
             <Button fx:id="addButton" text="Add" GridPane.rowIndex="4" GridPane.columnIndex="1"  GridPane.hgrow="ALWAYS" />
         </GridPane>
+
     </left>
 
     <center>
@@ -67,25 +64,25 @@
 
             <columns>
 
-                <TableColumn text="Manufacturer">
+                <TableColumn fx:id="columnManufacturer" text="Manufacturer">
                     <cellValueFactory>
                         <PropertyValueFactory property="manufacturer"/>
                     </cellValueFactory>
                 </TableColumn>
 
-                <TableColumn text="Model">
+                <TableColumn fx:id="columnModel" text="Model">
                     <cellValueFactory>
                         <PropertyValueFactory property="model"/>
                     </cellValueFactory>
                 </TableColumn>
 
-                <TableColumn text="IEMI Number">
+                <TableColumn fx:id="columnIEMINumber" text="IEMI Number">
                     <cellValueFactory >
                         <PropertyValueFactory property="imeiNumber"/>
                     </cellValueFactory>
                 </TableColumn>
 
-                <TableColumn text="Rate">
+                <TableColumn fx:id="columnRate" text="Rate">
                     <cellValueFactory>
                         <PropertyValueFactory property="rate"/>
                     </cellValueFactory>

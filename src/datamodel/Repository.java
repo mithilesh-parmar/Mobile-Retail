@@ -1,19 +1,12 @@
 package datamodel;
 
 import database.dao.ProductDao;
-import javafx.beans.Observable;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.value.ObservableFloatValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import utils.CSVHelper;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Repository {
 

@@ -95,7 +95,8 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return  manufacturer + " " + model + " \n" + imeiNumber ;
+		return  manufacturer.getValue() + " "
+				+ model.getValue()  ;
 	}
 
 

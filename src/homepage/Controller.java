@@ -4,13 +4,12 @@ import datamodel.PaymentMode;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import datamodel.Order;
 import datamodel.Product;
 import datamodel.Repository;
@@ -18,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import utils.Animations;
+import utils.PrinterHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -48,6 +48,8 @@ public class Controller implements Initializable {
 	public BorderPane mainBorderPane;
 	public HBox mainPage;
 	private Repository repository = Repository.getInstance(); // repo singleton instance
+	private final KeyCombination printKeyCombination = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+	private final KeyCombination clearKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
 
 
 	@Override
@@ -55,6 +57,7 @@ public class Controller implements Initializable {
 		repository.loadProducts(); // locad products from database
 		invoiceTable.setItems(repository.getOrdersList()); // set the items for tableview
 		itemsList.setItems(repository.getProductList()); // set the items for listview (loaded from database)
+		itemsList.getSelectionModel().selectFirst();// set initial focus to product list
 
 		dateLabel.setText(String.valueOf(LocalDate.now())); // set current system date
 		gstLabel.setText(String.valueOf(repository.getGSTPercentage()) + "%"); // set gst percentage
@@ -65,32 +68,43 @@ public class Controller implements Initializable {
 		// add search property to searchtextfield
 		searchTextField.textProperty().addListener((observable, oldValue, newValue) -> performSearch(oldValue,newValue));
 
+		// set eventhandlers
 		printButton.setOnAction(event -> confirmOrder()); // add handler
 		clearButton.setOnAction(event -> clearOrder()); // add handler
 
-		homeButton.setOnAction(event -> changePageTo(mainPage));
+		// sidebar buttons
+
+		homeButton.setOnAction(event -> {changePageTo(mainPage);});
 
 		inventoryButton.setOnAction(event -> {
 			try {
+				// change center node to inventory window
 				changePageTo(FXMLLoader.load(getClass().getResource("/inventory/inventory.fxml")));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
 
+		// change center node to reports window
 		reportsButton.setOnAction(event -> changePageTo(null));
+		// close the program
 		exitButton.setOnAction(event -> closeProgram());
-
 
 	}
 
-
+	/**
+	 * change the center node of borderpane to provided node
+	 * @param node
+	 */
 	private void changePageTo(Node node){
 		mainBorderPane.setCenter(node);
 	}
 
+	/**
+	 * close the program
+	 */
 	private void closeProgram() {
-
+		System.exit(0);
 	}
 
 
@@ -128,12 +142,21 @@ public class Controller implements Initializable {
 	 */
 	private void confirmOrder() {
 
-	if (isTextPresent(nameTextField) && isTextPresent(phoneNumberTextField) && isTextPresent(addressTextField) && isOrderPresent()){
+	if (isTextPresent(nameTextField) &&
+			isTextPresent(phoneNumberTextField) &&
+			isTextPresent(addressTextField) &&
+			isOrderPresent()){
+
 		boolean result = showAlert();
 		// TODO increase the invoice number
-		if (result) clearOrder();
+		if (result){
+			clearOrder();
+
+			PrinterHelper.print("Printing Bill");
+		}
 	}else {
 		showErrorDialog();
+		if (!nameTextField.isFocused())nameTextField.requestFocus();
 	}
 
 	}
@@ -235,6 +258,10 @@ public class Controller implements Initializable {
 				searchTextField.requestFocus(); // request focus
 				searchTextField.clear(); // clear the text to restore list to show all products
 			}
+		}else if (printKeyCombination.match(keyEvent)){
+			confirmOrder();
+		}else if (clearKeyCombination.match(keyEvent)){
+			clearOrder();
 		}
 	}
 
@@ -282,6 +309,10 @@ public class Controller implements Initializable {
 				invoiceTable.getItems().remove(order);
 			}
 			repository.decreaseTheQuantityByOne(order);
+		}else if (printKeyCombination.match(keyEvent)){
+			confirmOrder();
+		}else if (clearKeyCombination.match(keyEvent)){
+			clearOrder();
 		}
 	}
 
@@ -305,6 +336,18 @@ public class Controller implements Initializable {
 		Pane indicatorPane = (Pane) view.getChildren().get(0);
 		indicatorPane.setStyle("-fx-background-color:#2d3041;");
 		Animations.makeButtonInAnimations(50,view);
+	}
+
+	/**
+	 * add keyboard shortcuts for print and clear button to all textfields and labels
+	 * @param keyEvent
+	 */
+	public void addAccelerators(KeyEvent keyEvent) {
+		 if (printKeyCombination.match(keyEvent)){
+			confirmOrder();
+		}else if (clearKeyCombination.match(keyEvent)){
+			clearOrder();
+		}
 	}
 
 }

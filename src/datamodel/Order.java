@@ -12,6 +12,7 @@ public class Order {
 	private SimpleFloatProperty rate = new SimpleFloatProperty(0f);
 	private SimpleFloatProperty amount = new SimpleFloatProperty(0);
 	private SimpleStringProperty model = new SimpleStringProperty("");
+	private SimpleStringProperty imeiNumber = new SimpleStringProperty("");
 
 	private Product p; // extract the values of the product model
 
@@ -20,6 +21,7 @@ public class Order {
 		this.manufacturer.set(p.getManufacturer());
 		this.rate.set(p.getRate());
 		this.model.set(p.getModel());
+		this.imeiNumber.set(p.getImeiNumber());
 		// set the amount to rate * quantity
 		this.amount.set(this.rate.floatValue() * this.quantity.intValue());
 	}
@@ -98,6 +100,18 @@ public class Order {
 
 	public void setP(Product p) {
 		this.p = p;
+	}
+
+	public String getImeiNumber() {
+		return imeiNumber.get();
+	}
+
+	public SimpleStringProperty imeiNumberProperty() {
+		return imeiNumber;
+	}
+
+	public void setImeiNumber(String imeiNumber) {
+		this.imeiNumber.set(imeiNumber);
 	}
 
 	public void increaseQuantityByOne(){

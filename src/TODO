@@ -1,7 +1,8 @@
-// TODO add mnemonics to buttons
 // TODO style labels
 // TODO on confirm print the order (High Priority)
 // TODO add menubar
 // TODO add email functionality
-// TODO add comments to inventory controller
-// TODO check delete quwery for product dao (not deleting product from database)
+// TODO add editing functionality to inventory table
+// TODO show alert while deleting product from inventory
+// TODO show only one product if multiple are present in inventory
+// TODO set iemi number as primary key for database
