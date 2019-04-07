@@ -1,6 +1,7 @@
 package test;
 
 import database.DatabaseHelper;
+import database.dao.ProductDao;
 import database.dao.SalesDao;
 import datamodel.*;
 
@@ -11,6 +12,7 @@ public class SalesTest {
 	public static void main(String[] args) {
 
 		DatabaseHelper.dropTable(SalesDao.TABLE_NAME);
+		DatabaseHelper.dropTable(ProductDao.TABLE_NAME);
 //		SalesDao salesDao = new SalesDao();
 //		Customer customer =new Customer("Abhishek parmar","8561057510","Jecrc");
 //		List<Order> orders = new ArrayList<>();

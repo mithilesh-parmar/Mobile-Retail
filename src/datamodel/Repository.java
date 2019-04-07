@@ -24,9 +24,9 @@ public class Repository {
 	private ObservableList<Sale> salesList; // sales list
 	private ProductDao productDao; // dao for database operations
 	private SalesDao salesDao; // dao for database operations
-	private FloatProperty totalAmount;
-	private FloatProperty totalPayableAmount;
-	private IntegerProperty invoiceNumberProperty = new SimpleIntegerProperty(1);
+	private FloatProperty totalAmount; // total amount of products
+	private FloatProperty totalPayableAmount; // total payable amount including gst
+	private IntegerProperty invoiceNumberProperty = new SimpleIntegerProperty(1); // invoice number
 
 	/**
 	 * Synchronized method for getting an instance
@@ -77,7 +77,7 @@ public class Repository {
 	 * remove product from database
 	 * @param p
 	 */
-	public void removeProductFromDatabase(Product p){productDao.removeProductFromDatabase(p);}
+	private void removeProductFromDatabase(Product p){productDao.removeProductFromDatabase(p);}
 
 	/**
 	 * private constructor
@@ -94,6 +94,7 @@ public class Repository {
 		salesDao = new SalesDao();
 		loadSales();
 		loadProducts();
+		// add listener to invoice number
 		salesList.addListener((ListChangeListener<Sale>) c -> invoiceNumberProperty.set(salesList.size() + 1));
 	}
 
@@ -222,6 +223,7 @@ public class Repository {
 		ordersList.clear();
 	}
 
+	// getters and setters
 	public FloatProperty totalAmountProperty() {
 		return totalAmount;
 	}
@@ -240,5 +242,14 @@ public class Repository {
 
 	public void setInvoiceNumberProperty(int invoiceNumberProperty) {
 		this.invoiceNumberProperty.set(invoiceNumberProperty);
+	}
+
+	/**
+	 * close all the connections
+	 * shutdown database
+	 * perform all the write operations
+	 */
+	public void closeProgram() {
+
 	}
 }

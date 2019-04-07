@@ -10,34 +10,21 @@ import java.util.*;
 
 public class Sale {
 
-	/**
-	 *			COLUMNS.ID.toString() + " varchar(255), "+
-	 * 			COLUMNS.DATE.toString() + " DATE, "+
-	 * 			COLUMNS.INVOICE_NUMBER.toString() + " int, "+
-	 * 			COLUMNS.CUSTOMER_ID.toString() + " varchar(255), "+
-	 * 			COLUMNS.NAME.toString() + " varchar(255), "+
-	 * 			COLUMNS.MOBILE_NUMBER.toString() + " varchar(255), "+
-	 * 			COLUMNS.ADDRESS.toString() + " varchar(255), "+
-	 * 			COLUMNS.PRODUCTS.toString() + " varchar(255), "+
-	 * 			COLUMNS.PAYMENT_MODE.toString() + " varchar(255) " +
-	 * 			")";
-	 */
+	// properties
+	private SimpleStringProperty name = new SimpleStringProperty(""); // customer name
+	private	SimpleObjectProperty<LocalDate> date = new SimpleObjectProperty<>(); // sale date
+	private SimpleIntegerProperty invoiceNumber = new SimpleIntegerProperty(); // invoice number
+	private SimpleStringProperty mobileNumber = new SimpleStringProperty(); // customer mobile number
+	private SimpleStringProperty address = new SimpleStringProperty(); // customer address
+	private SimpleStringProperty products = new SimpleStringProperty(); // orderlist in string
+	private SimpleStringProperty paymentMode = new SimpleStringProperty(); // paymentmode
 
-	private SimpleStringProperty name = new SimpleStringProperty("");
-	private	SimpleObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
-	private SimpleIntegerProperty invoiceNumber = new SimpleIntegerProperty();
-	private SimpleStringProperty mobileNumber = new SimpleStringProperty();
-	private SimpleStringProperty address = new SimpleStringProperty();
-	private SimpleStringProperty products = new SimpleStringProperty();
-	private SimpleStringProperty paymentMode = new SimpleStringProperty();
 
+	// objects
 	private Customer customer; // customer
 	private Organization organization; // company
 	private List<Order> orderList; // orders for the customer
 	private UUID id; // id of invoice
-//	private int invoiceNumber; // invoice number
-//	private LocalDate date; // date of issue
-//	private PaymentMode paymentMode; // payment mode for purchase
 
 	public Sale(Customer customer, List<Order> orderList, int invoiceNumber ,PaymentMode paymentMode) {
 		id = UUID.randomUUID(); // set a random id
@@ -45,8 +32,12 @@ public class Sale {
 		this.customer = customer;
 		this.organization = Organization.getInstance();
 		this.orderList = orderList;
+		setOrderList(getProductsListAsString()); // set products property string from list of products
 		this.invoiceNumber.set(invoiceNumber);
 		this.paymentMode.set(paymentMode.toString());
+		this.name.set(customer.getName());
+		this.address.set(customer.getAddress());
+		this.mobileNumber.set(customer.getMobileNumber());
 	}
 
 	public Sale() {
@@ -67,10 +58,10 @@ public class Sale {
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
+		// set the properties to respective values
 		this.name.set(customer.getName());
 		this.address.set(customer.getAddress());
 		this.mobileNumber.set(customer.getMobileNumber());
-
 	}
 
 	public Organization getOrganization() {
@@ -177,33 +168,60 @@ public class Sale {
 		return id;
 	}
 
+	public UUID getCustomerID(){
+		return customer.getId();
+	}
+
+	/**
+	 * helper function which formats the products string passed to it
+	 * Manufacturer :
+	 * Model:
+	 * IEMI nUMBER:
+	 * RATE:
+	 * and also sets these to order object which is then added to orderlist
+	 * used to parse orderlist from database to list to be shown in table
+	 * @param products
+	 */
 	public void setOrderList(String products){
 		StringBuilder stringBuilder = new StringBuilder();
 
+		// split the orders
 		String[] lines = products.split("\n");
+
 		List<Order> orders = new ArrayList<>();
 		for (int i = 0; i < lines.length; i++) {
 			Order order = new Order();
+			// all the properties of a product
 			String[] properties = lines[i].split(" ");
+
+			// set the manufacturer property
 			order.setManufacturer(properties[0]);
 			stringBuilder.append("Manufacturer: ").append(properties[0]).append("\n");
 
+			// set the model property
 			order.setModel(properties[1]);
 			stringBuilder.append("Model: ").append(properties[1]).append("\n");
 
+			// set the imei number
 			order.setImeiNumber(properties[2]);
 			stringBuilder.append("IMEI Number: ").append(properties[2]).append("\n");
 
+			// set the rate
 			order.setRate(Float.parseFloat(properties[3]));
 			stringBuilder.append("Rate: ").append(properties[3]).append("\n\n\n");
 
+			// set the id of product
 			order.getP().setId(UUID.fromString(properties[4]));
 			orders.add(order);
 		}
 		this.orderList = orders;
+		// set the products property to string of orders
 		this.products.set(stringBuilder.toString());
 	}
 
+	/**
+	 * @return the orderlist as string
+	 */
 	public String getProductsListAsString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (Order o :orderList){
@@ -217,6 +235,7 @@ public class Sale {
 		return stringBuilder.toString();
 	}
 
+	// displays the object properties
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();

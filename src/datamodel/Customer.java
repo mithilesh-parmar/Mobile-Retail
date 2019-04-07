@@ -17,7 +17,7 @@ public class Customer {
 	}
 
 	public Customer() {
-
+		id = UUID.randomUUID();
 	}
 
 	// getters and setters

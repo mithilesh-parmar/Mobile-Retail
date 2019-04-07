@@ -2,21 +2,14 @@ package inventory;
 
 import datamodel.Product;
 import datamodel.Repository;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import utils.Animations;
-import utils.IEMIListCell;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class InventoryController implements Initializable {
@@ -57,9 +50,11 @@ public class InventoryController implements Initializable {
 				isTextPresent(modelTextField) &&
 				isTextPresent(rateTextField) &&
 				isTextPresent(iemiNumberTextField)){
+			String model = getText(modelTextField);
+			model = model.replace(" ","");
 			repository.addProductToInventory(new Product(
 					getText(manufacturerTextField),
-					getText(modelTextField),
+					model,
 					getText(iemiNumberTextField),
 					Float.parseFloat(getText(rateTextField))
 			));
@@ -71,7 +66,7 @@ public class InventoryController implements Initializable {
 	 * remove product from database
 	 */
 	public void removeProductFromDatabase(){
-		repository.removeProductFromDatabase(inventoryTable.getSelectionModel().getSelectedItem());
+		repository.removeProductFromInventroy(inventoryTable.getSelectionModel().getSelectedItem());
 	}
 
 	/**
@@ -110,9 +105,30 @@ public class InventoryController implements Initializable {
 	public void onInventoryTableKeyPressed(KeyEvent keyEvent) {
 		KeyCode keyCode = keyEvent.getCode();
 		if (keyCode == KeyCode.BACK_SPACE){
-			repository.removeProductFromInventroy(inventoryTable.getSelectionModel().getSelectedItem());
+			Product product = inventoryTable.getSelectionModel().getSelectedItem();
+			if (showAlert(product));repository.removeProductFromInventroy(product);
 		}
 	}
 
+	/**
+	 * alert dialog to confirm deletion of inventory item
+	 * @param selectedItem
+	 * @return
+	 */
+	private boolean showAlert(Product selectedItem){
+		Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+		String str =
+				"Manufacturer: " + selectedItem.getManufacturer() + "\n" +
+				"Model: " + selectedItem.getModel() + "\n" +
+				"IEMI NUMBER: " + selectedItem.getImeiNumber() + "\n" +
+				"Rate: " + selectedItem.getRate() + "\n" ;
+		alert.setContentText(str);
+		alert.initOwner(inventoryTable.getScene().getWindow());
+
+
+		Optional<ButtonType> response = alert.showAndWait();
+
+		return response.get() == ButtonType.OK ;
+	}
 
 }

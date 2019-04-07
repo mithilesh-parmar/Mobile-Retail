@@ -156,10 +156,10 @@ public abstract class DatabaseHelper {
 //			statement.setString(1,s.getId().toString());
 			statement.setDate(1, Date.valueOf(s.getDate()));
 			statement.setInt(2,s.getInvoiceNumber());
-			statement.setString(3,s.getCustomer().getId().toString());
-			statement.setString(4,s.getCustomer().getName());
-			statement.setString(5,s.getCustomer().getMobileNumber());
-			statement.setString(6,s.getCustomer().getAddress());
+			statement.setString(3,s.getCustomerID().toString());
+			statement.setString(4,s.getName());
+			statement.setString(5,s.getMobileNumber());
+			statement.setString(6,s.getAddress());
 			statement.setString(7,s.getProductsListAsString());
 			statement.setString(8,s.getPaymentMode());
 			result =  statement.execute();

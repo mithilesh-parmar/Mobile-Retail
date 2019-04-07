@@ -14,6 +14,6 @@ public class SalesController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		salesTable.setItems(repository.getSalesList());
-		// TODO sales items are being nullified check repository
+
 	}
 }

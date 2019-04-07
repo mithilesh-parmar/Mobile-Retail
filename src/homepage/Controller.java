@@ -48,6 +48,7 @@ public class Controller implements Initializable {
 	public BorderPane mainBorderPane;
 	public HBox mainPage;
 	private Repository repository = Repository.getInstance(); // repo singleton instance
+	// key combinations for shortcuts
 	private final KeyCombination printKeyCombination = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination clearKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
 
@@ -118,10 +119,8 @@ public class Controller implements Initializable {
 	 * close the program
 	 */
 	private void closeProgram() {
-		Customer customer =new Customer("Mithilesh parmar","8561057510","Jecrc");
-		List<Order> orders = new ArrayList<>();
-		orders.add(new Order(new Product("Apple","iPhone10","2131asd31",1312)));
-		repository.addSale(new Sale(customer,orders,repository.getInvoiceNumberProperty(),PaymentMode.CASH));
+		repository.closeProgram();
+		System.exit(0);
 	}
 
 
@@ -164,17 +163,44 @@ public class Controller implements Initializable {
 			isTextPresent(addressTextField) &&
 			isOrderPresent()){
 
-		boolean result = showAlert();
-		// TODO increase the invoice number
-		if (result){
-			clearOrder();
-
+		if (showAlert()){
+			// save sale to database
+			addSaleToDatabase();
+			// print the order
 			PrinterHelper.print("Printing Bill");
+			// clear the order
+			clearOrder();
 		}
 	}else {
 		showErrorDialog();
 		if (!nameTextField.isFocused())nameTextField.requestFocus();
 	}
+
+	}
+
+	/**
+	 * add sale to database on confirming sale
+	 */
+	private void addSaleToDatabase() {
+
+		Customer customer =new Customer();
+		customer.setName( nameTextField.getText());
+		customer.setMobileNumber(phoneNumberTextField.getText());
+		customer.setAddress(addressTextField.getText());
+		List<Order> orderList = new ArrayList<>(invoiceTable.getItems());
+		repository.addSale(
+				new Sale(
+						customer,
+						orderList,  // all the products in invoice table (order) in arraylist form
+						repository.getInvoiceNumberProperty(), // latest invoice number from repository
+						paymentModeComboBox.getSelectionModel().getSelectedItem() // payment mode
+				)
+		);
+
+		// remove the products from inventory
+		for (Order o :orderList){
+			repository.removeProductFromInventroy(o.getP());
+		}
 
 	}
 
@@ -229,9 +255,7 @@ public class Controller implements Initializable {
 
 		Optional<ButtonType> buttonType = alert.showAndWait();
 
-		if (buttonType.get() == ButtonType.OK) return true;
-
-		return false;
+		return buttonType.get() == ButtonType.OK;
 	}
 
 	/**
