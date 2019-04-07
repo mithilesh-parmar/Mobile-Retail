@@ -147,7 +147,7 @@
                     <!--(0,4)-->
                     <ComboBox fx:id="paymentModeComboBox" GridPane.rowIndex="0" GridPane.columnIndex="4" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
 
-                    <!--Invoice Number-->
+                    <!--Sale Number-->
                     <!--(1,3)-->
                     <Label text="Invoice Number : " GridPane.rowIndex="1" GridPane.columnIndex="3" GridPane.halignment="RIGHT"/>
                     <!--(1,4)-->
@@ -200,12 +200,6 @@
                         <TableColumn text="IEMI NUMBER">
                             <cellValueFactory>
                                 <PropertyValueFactory property="imeiNumber"/>
-                            </cellValueFactory>
-                        </TableColumn>
-
-                        <TableColumn text="Quantity">
-                            <cellValueFactory>
-                                <PropertyValueFactory property="quantity"/>
                             </cellValueFactory>
                         </TableColumn>
 

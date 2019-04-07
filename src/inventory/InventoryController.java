@@ -2,16 +2,19 @@ package inventory;
 
 import datamodel.Product;
 import datamodel.Repository;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import utils.Animations;
+import utils.IEMIListCell;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,13 +31,21 @@ public class InventoryController implements Initializable {
 	public TableColumn columnModel;
 	public TableColumn columnIEMINumber;
 	public TableColumn columnRate;
+	public Label iemiLabel;
+	public GridPane inventoryItemInputGridPane;
 	private Repository repository = Repository.getInstance();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		inventoryTable.setItems(repository.getProductList()); // show all available products in table
 		addButton.setOnAction(event -> addProductToDatabase()); // add event handler
+		rateTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue.matches("\\d*")) {
+				rateTextField.setText(newValue.replaceAll("[^\\d]", ""));
+			}
+		});
 	}
+
 
 	/**
 	 * add product to database
@@ -92,7 +103,6 @@ public class InventoryController implements Initializable {
 		iemiNumberTextField.clear();
 	}
 
-
 	/**
 	 * on pressing backspace remove product from database
 	 * @param keyEvent
@@ -103,4 +113,6 @@ public class InventoryController implements Initializable {
 			repository.removeProductFromInventroy(inventoryTable.getSelectionModel().getSelectedItem());
 		}
 	}
+
+
 }

@@ -26,6 +26,10 @@ public class Order {
 		this.amount.set(this.rate.floatValue() * this.quantity.intValue());
 	}
 
+	public Order() {
+		p = new Product();
+	}
+
 	public void setQuantity(int quantity){
 		this.quantity.set(quantity);
 		// update amount
@@ -112,14 +116,6 @@ public class Order {
 
 	public void setImeiNumber(String imeiNumber) {
 		this.imeiNumber.set(imeiNumber);
-	}
-
-	public void increaseQuantityByOne(){
-		setQuantity(this.quantity.getValue() + 1);
-	}
-
-	public void decreaseQuantityByOne(){
-		setQuantity(this.quantity.getValue() - 1);
 	}
 
 	@Override

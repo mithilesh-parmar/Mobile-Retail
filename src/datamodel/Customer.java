@@ -16,6 +16,10 @@ public class Customer {
 		this.address = address;
 	}
 
+	public Customer() {
+
+	}
+
 	// getters and setters
 	public UUID getId() {
 		return id;

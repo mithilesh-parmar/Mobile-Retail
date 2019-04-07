@@ -33,6 +33,7 @@ public class Product {
 
 	// getters and setters
 
+
 	public String getManufacturer() {
 		return manufacturer.get();
 	}
@@ -92,6 +93,15 @@ public class Product {
 	public void setRate(float rate) {
 		this.rate.set(rate);
 	}
+
+	public String getProductName(){
+		String name = manufacturer.getValue().toUpperCase() + model.getValue().toUpperCase();
+		name = name.replace(" ","");
+		System.out.println("Name "+name);
+		return name;
+	}
+
+
 
 	@Override
 	public String toString() {

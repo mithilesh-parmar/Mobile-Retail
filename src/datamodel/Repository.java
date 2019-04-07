@@ -1,9 +1,16 @@
 package datamodel;
 
 import database.dao.ProductDao;
+import database.dao.SalesDao;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.FloatProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ObservableFloatValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import java.util.Arrays;
@@ -14,9 +21,12 @@ public class Repository {
 	private ObservableList<Product> productList; // product list loaded from database
 	private ObservableList<Order> ordersList; // list for tableview
 	private ObservableList<PaymentMode> paymentModes; // all available payment modes-
+	private ObservableList<Sale> salesList; // sales list
 	private ProductDao productDao; // dao for database operations
-	private FloatProperty totalAmount ;
+	private SalesDao salesDao; // dao for database operations
+	private FloatProperty totalAmount;
 	private FloatProperty totalPayableAmount;
+	private IntegerProperty invoiceNumberProperty = new SimpleIntegerProperty(1);
 
 	/**
 	 * Synchronized method for getting an instance
@@ -39,11 +49,28 @@ public class Repository {
 	}
 
 	/**
+	 * load sales from database into list
+	 */
+
+	public void loadSales(){
+		salesList.addAll(salesDao.loadSales());
+		invoiceNumberProperty.set(salesList.size() + 1); // set inital value of invoice number
+	}
+
+	/**
 	 * add a product to database
 	 * @param p
 	 */
 	public void saveProductToDatabase(Product p){
 		productDao.addProductToDatabase(p);
+	}
+
+	/**
+	 * sace sale item to database
+	 * @param s
+	 */
+	public void saveSaleToDatabase(Sale s){
+		salesDao.addSaleToDatabase(s);
 	}
 
 	/**
@@ -60,9 +87,14 @@ public class Repository {
 		productList = FXCollections.observableArrayList();
 		ordersList = FXCollections.observableArrayList();
 		paymentModes = FXCollections.observableArrayList();
+		salesList = FXCollections.observableArrayList();
 		totalAmount = new SimpleFloatProperty(0);
 		totalPayableAmount = new SimpleFloatProperty(0);
 		productDao = new ProductDao();
+		salesDao = new SalesDao();
+		loadSales();
+		loadProducts();
+		salesList.addListener((ListChangeListener<Sale>) c -> invoiceNumberProperty.set(salesList.size() + 1));
 	}
 
 	/**
@@ -71,27 +103,8 @@ public class Repository {
 	 * @param p
 	 */
 	public void addOrder(Order p){
-		if (ordersList.contains(p)) ordersList.get(ordersList.indexOf(p)).increaseQuantityByOne();
-		else ordersList.add(p);
+		ordersList.add(p);
 		setTotalAmount(totalAmount.getValue()+p.getAmount());
-	}
-
-	/**
-	 * increase the quantity of order by one
-	 * @param o
-	 */
-	public void increaseTheQuantityByOne(Order o){
-		o.increaseQuantityByOne();
-		setTotalAmount(totalAmount.getValue() + o.getP().getRate());
-	}
-
-	/**
-	 * decrease the quantity of order by one
-	 * @param o
-	 */
-	public void decreaseTheQuantityByOne(Order o){
-		o.decreaseQuantityByOne();
-		setTotalAmount(totalAmount.getValue() - o.getP().getRate());
 	}
 
 	/**
@@ -103,6 +116,15 @@ public class Repository {
 	public void addProductToInventory(Product p){
 		productList.add(p);
 		saveProductToDatabase(p);
+	}
+
+	/**
+	 * add sale to salelist
+	 * @param s
+	 */
+	public void addSale(Sale s){
+		salesList.add(s);
+		saveSaleToDatabase(s);
 	}
 
 	/**
@@ -157,6 +179,7 @@ public class Repository {
 		return 12 ;
 	}
 
+
 	/**
 	 * returns available payment modes
 	 * @return
@@ -164,6 +187,14 @@ public class Repository {
 	public ObservableList<PaymentMode> getPaymentModes(){
 		paymentModes.addAll(Arrays.asList(PaymentMode.values()));
 		return paymentModes;
+	}
+
+	/**
+	 * observable list of sales
+	 * @return
+	 */
+	public ObservableList<Sale> getSalesList() {
+		return salesList;
 	}
 
 	/**
@@ -199,13 +230,15 @@ public class Repository {
 		return totalPayableAmount;
 	}
 
-	public Number getTotalAmount() {
-		return totalAmount.get();
+	public int getInvoiceNumberProperty() {
+		return invoiceNumberProperty.get();
 	}
 
-	public Number getTotalPayableAmount() {
-		return totalPayableAmount.get();
+	public IntegerProperty invoiceNumberPropertyProperty() {
+		return invoiceNumberProperty;
 	}
 
-
+	public void setInvoiceNumberProperty(int invoiceNumberProperty) {
+		this.invoiceNumberProperty.set(invoiceNumberProperty);
+	}
 }

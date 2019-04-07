@@ -1,6 +1,7 @@
 package homepage;
 
-import datamodel.PaymentMode;
+import database.dao.SalesDao;
+import datamodel.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,9 +11,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import datamodel.Order;
-import datamodel.Product;
-import datamodel.Repository;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -22,6 +20,8 @@ import utils.PrinterHelper;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -54,10 +54,12 @@ public class Controller implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		repository.loadProducts(); // locad products from database
+//		repository.loadProducts(); // load products from database
 		invoiceTable.setItems(repository.getOrdersList()); // set the items for tableview
 		itemsList.setItems(repository.getProductList()); // set the items for listview (loaded from database)
 		itemsList.getSelectionModel().selectFirst();// set initial focus to product list
+
+		invoiceNumberLabel.textProperty().bind(repository.invoiceNumberPropertyProperty().asString()); // set the invoice number
 
 		dateLabel.setText(String.valueOf(LocalDate.now())); // set current system date
 		gstLabel.setText(String.valueOf(repository.getGSTPercentage()) + "%"); // set gst percentage
@@ -86,10 +88,22 @@ public class Controller implements Initializable {
 		});
 
 		// change center node to reports window
-		reportsButton.setOnAction(event -> changePageTo(null));
+		reportsButton.setOnAction(event -> {
+			try {
+				changePageTo(FXMLLoader.load(getClass().getResource("/sales/sales.fxml")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
 		// close the program
 		exitButton.setOnAction(event -> closeProgram());
 
+		// set phone textfield to be numberic only
+		phoneNumberTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue.matches("\\d*")) {
+				phoneNumberTextField.setText(newValue.replaceAll("[^\\d]", ""));
+			}
+		});
 	}
 
 	/**
@@ -104,7 +118,10 @@ public class Controller implements Initializable {
 	 * close the program
 	 */
 	private void closeProgram() {
-		System.exit(0);
+		Customer customer =new Customer("Mithilesh parmar","8561057510","Jecrc");
+		List<Order> orders = new ArrayList<>();
+		orders.add(new Order(new Product("Apple","iPhone10","2131asd31",1312)));
+		repository.addSale(new Sale(customer,orders,repository.getInvoiceNumberProperty(),PaymentMode.CASH));
 	}
 
 
@@ -299,16 +316,6 @@ public class Controller implements Initializable {
 		}else if (keyCode == KeyCode.LEFT){
 			// shift the focus to listview
 			if (!itemsList.isFocused()) itemsList.requestFocus();
-		}else if (keyCode == KeyCode.ADD || keyCode == KeyCode.PLUS){
-			// increase the quantity by one
-			repository.increaseTheQuantityByOne(invoiceTable.getSelectionModel().getSelectedItem());
-		}else if (keyCode == KeyCode.MINUS || keyCode == KeyCode.SUBTRACT){
-			// decrease the quantity by one
-			Order order = invoiceTable.getSelectionModel().getSelectedItem();
-			if (order.getQuantity() == 1){
-				invoiceTable.getItems().remove(order);
-			}
-			repository.decreaseTheQuantityByOne(order);
 		}else if (printKeyCombination.match(keyEvent)){
 			confirmOrder();
 		}else if (clearKeyCombination.match(keyEvent)){

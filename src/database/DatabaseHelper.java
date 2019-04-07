@@ -3,6 +3,7 @@ package database;
 import com.sun.rowset.CachedRowSetImpl;
 import database.dao.ProductDao;
 import datamodel.Product;
+import datamodel.Sale;
 
 import java.sql.*;
 
@@ -12,7 +13,7 @@ public abstract class DatabaseHelper {
 
 	private static final String DATABASE_NAME = "MOBILE_RETAIL";
 	private static final String DRIVER = "org.apache.derby.jdbc.EmbeddedDriver";
-	private static final String CONNECTION_URL = "jdbc:derby:"+DATABASE_NAME+";create=true";
+	private static final String CONNECTION_URL = "jdbc:derby:"+DATABASE_NAME+";create=true;derby.language.sequence.preallocator=1";
 	private static Connection connection;
 
 	/**
@@ -75,7 +76,7 @@ public abstract class DatabaseHelper {
 	/**
 	 * used to execute query (drop statement)
 	 *
-	 * @param s
+	 * @param
 	 * @param query
 	 * @return
 	 */
@@ -118,6 +119,49 @@ public abstract class DatabaseHelper {
 			statement.setString(3,p.getModel());
 			statement.setString(4,p.getImeiNumber());
 			statement.setFloat(5,p.getRate());
+			result =  statement.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			try{
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			disconnectDatabase();
+		}
+		return result;
+	}
+
+	public static boolean executePreparedStatement(String query, Sale s){
+		PreparedStatement statement = null;
+		boolean result  = false;
+		try{
+			connectDatabase();
+			statement = connection.prepareStatement(query);
+			// set the parameters
+			/**
+			 * 			COLUMNS.ID.toString() + "varchar(255), "+
+			 * 			COLUMNS.DATE.toString() + "DATE(), "+
+			 * 			COLUMNS.INVOICE_NUMBER.toString() + "int, "+
+			 * 			COLUMNS.CUSTOMER_ID.toString() + "varchar(255), "+
+			 * 			COLUMNS.NAME.toString() + "varchar(255), "+
+			 * 			COLUMNS.MOBILE_NUMBER.toString() + "varchar(255), "+
+			 * 			COLUMNS.ADDRESS.toString() + "varchar(255), "+
+			 * 			COLUMNS.PRODUCTS.toString() + "varchar(255), "+
+			 * 			COLUMNS.PAYMENT_MODE.toString() + "varchar(255), " +
+			 * 			")";
+			 */
+
+//			statement.setString(1,s.getId().toString());
+			statement.setDate(1, Date.valueOf(s.getDate()));
+			statement.setInt(2,s.getInvoiceNumber());
+			statement.setString(3,s.getCustomer().getId().toString());
+			statement.setString(4,s.getCustomer().getName());
+			statement.setString(5,s.getCustomer().getMobileNumber());
+			statement.setString(6,s.getCustomer().getAddress());
+			statement.setString(7,s.getProductsListAsString());
+			statement.setString(8,s.getPaymentMode());
 			result =  statement.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();

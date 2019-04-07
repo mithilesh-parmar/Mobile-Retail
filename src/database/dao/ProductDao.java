@@ -55,13 +55,13 @@ public class ProductDao implements EntityInterface {
 		return parseProductsResultSet(resultSet);
 	}
 
+
 	/**
 	 * add product to database
 	 * @param product to be added to database
 	 */
 
 	public void addProductToDatabase(Product product){
-		String id = String.valueOf(product.getId());
 		String query = INSERT_QUERY + " VALUES (?,?,?,?,?)";
 		boolean result = DatabaseHelper.executePreparedStatement(query,product);
 	}

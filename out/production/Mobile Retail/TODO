@@ -1,7 +1,7 @@
 // TODO style labels
 // TODO on confirm print the order (High Priority)
-// TODO add menubar
 // TODO add email functionality
 // TODO add editing functionality to inventory table
 // TODO show alert while deleting product from inventory
-// TODO show only one product if multiple are present in inventory
+// TODO on successful order remove one quantity from database
+// TODO do all the database write operations on program close or on a thread
