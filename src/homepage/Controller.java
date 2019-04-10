@@ -2,28 +2,29 @@ package homepage;
 
 import database.dao.SalesDao;
 import datamodel.*;
+import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
+import javafx.scene.transform.Scale;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import utils.Animations;
+import utils.PrintController;
 import utils.PrinterHelper;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -47,10 +48,13 @@ public class Controller implements Initializable {
 	public Button exitButton;
 	public BorderPane mainBorderPane;
 	public HBox mainPage;
+	public GridPane topLayout;
 	private Repository repository = Repository.getInstance(); // repo singleton instance
 	// key combinations for shortcuts
 	private final KeyCombination printKeyCombination = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination clearKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+
+	private Sale sale;
 
 
 	@Override
@@ -121,6 +125,34 @@ public class Controller implements Initializable {
 	private void closeProgram() {
 		repository.closeProgram();
 		System.exit(0);
+
+//		jasper();
+
+//		try {
+//			changePageTo(FXMLLoader.load(getClass().getResource("/utils/print.fxml")));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+	}
+
+	private void jasper() {
+		try {
+
+			JasperReport jasperReport = null;
+			jasperReport = JasperCompileManager.compileReport("/Users/mithilesh/Desktop/Mobile Retail/src/res/report.jrxml");
+			List<Employee> modelList = new ArrayList<Employee>();
+			modelList.add(new Employee("1", "Akshay", "IT", "akshaysharma@gmail.com"));
+			modelList.add(new Employee("2", "Rahul", "IT", "rahulgupta@gmail.com"));
+			modelList.add(new Employee("3", "Dev", "IT", "dev@gmail.com"));
+			modelList.add(new Employee("4", "Ankit", "IT", "ankit@gmail.com"));
+			JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(modelList);
+			Map<String, Object> params = new HashMap<String, Object>();
+			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
+			String path = "D://demoReportOutput.pdf";
+			JasperExportManager.exportReportToPdfFile(jasperPrint, path);
+		} catch (JRException e) {
+			e.printStackTrace();
+		}
 	}
 
 
@@ -167,7 +199,9 @@ public class Controller implements Initializable {
 			// save sale to database
 			addSaleToDatabase();
 			// print the order
-			PrinterHelper.print("Printing Bill");
+
+
+
 			// clear the order
 			clearOrder();
 		}
@@ -175,6 +209,46 @@ public class Controller implements Initializable {
 		showErrorDialog();
 		if (!nameTextField.isFocused())nameTextField.requestFocus();
 	}
+
+	}
+
+	private void printNode(BorderPane root) {
+		PrinterJob job = PrinterJob.createPrinterJob();
+		Printer printer = job.getPrinter();
+		PageLayout pageLayout = printer.createPageLayout(
+				Paper.A4,
+				PageOrientation.PORTRAIT,
+				Printer.MarginType.HARDWARE_MINIMUM);
+
+
+		double width = root.getWidth();
+		double height = root.getHeight();
+
+
+		PrintResolution resolution = job.getJobSettings().getPrintResolution();
+
+		width /= resolution.getFeedResolution();
+
+		height /= resolution.getCrossFeedResolution();
+
+		System.out.println("Width "+width);
+		System.out.println("Height "+height);
+
+
+		double scaleX = pageLayout.getPrintableWidth()/width/600;
+		double scaleY = pageLayout.getPrintableHeight()/height/600;
+
+		Scale scale = new Scale(scaleX, scaleY);
+
+		System.out.println("Scale "+scale);
+
+		root.getTransforms().add(scale);
+
+		boolean success = job.printPage(pageLayout, root);
+		if(success){
+			job.endJob();
+		}
+		root.getTransforms().remove(scale);
 
 	}
 
@@ -188,14 +262,31 @@ public class Controller implements Initializable {
 		customer.setMobileNumber(phoneNumberTextField.getText());
 		customer.setAddress(addressTextField.getText());
 		List<Order> orderList = new ArrayList<>(invoiceTable.getItems());
-		repository.addSale(
-				new Sale(
-						customer,
-						orderList,  // all the products in invoice table (order) in arraylist form
-						repository.getInvoiceNumberProperty(), // latest invoice number from repository
-						paymentModeComboBox.getSelectionModel().getSelectedItem() // payment mode
-				)
+		Sale s =new Sale(
+				customer,
+				orderList,  // all the products in invoice table (order) in arraylist form
+				repository.getInvoiceNumberProperty(), // latest invoice number from repository
+				paymentModeComboBox.getSelectionModel().getSelectedItem() // payment mode
 		);
+
+//		try {
+//			FXMLLoader loader = new FXMLLoader();
+//			loader.setLocation(getClass().getResource("/utils/print.fxml"));
+//			Node node = loader.load();
+//			PrintController controller = loader.getController();
+//			if (controller != null){
+//				controller.setSale(s);
+//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//				alert.setGraphic(node);
+//				alert.showAndWait();
+//				printNode((BorderPane) alert.getGraphic());
+//			}else System.out.println("Controller not found");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
+
+		repository.addSale(s);
 
 		// remove the products from inventory
 		for (Order o :orderList){

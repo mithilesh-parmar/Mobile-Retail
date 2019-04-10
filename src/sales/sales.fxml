@@ -6,6 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="sales.SalesController"
+            stylesheets="@/styles/dark_metro_style.css"
            >
 
     <center>

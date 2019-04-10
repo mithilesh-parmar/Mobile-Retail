@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="derby" level="project" />
+    <orderEntry type="library" name="net.sf.jasperreports:jasperreports:6.8.0" level="project" />
   </component>
 </module>

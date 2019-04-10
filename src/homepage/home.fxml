@@ -120,7 +120,7 @@
 
                 <!--Customer Details view Top view -->
 
-                <GridPane alignment="CENTER_LEFT" hgap="10" vgap="10">
+                <GridPane fx:id="topLayout" alignment="CENTER_LEFT" hgap="10" vgap="10">
 
                     <padding>
                         <Insets topRightBottomLeft="16"/>
