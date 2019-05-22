@@ -129,7 +129,7 @@
                     <!--Name input -->
                     <!--(0,1)-->
                     <Label text="Name" GridPane.rowIndex="0"/>
-                    <TextField fx:id="nameTextField" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators"/>
+                    <TextField fx:id="nameTextField" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" onKeyPressed="#addAccelerators" />
 
                     <!--Phone number input-->
                     <!--(1,1)-->

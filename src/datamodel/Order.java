@@ -13,6 +13,12 @@ public class Order {
 	private SimpleFloatProperty amount = new SimpleFloatProperty(0);
 	private SimpleStringProperty model = new SimpleStringProperty("");
 	private SimpleStringProperty imeiNumber = new SimpleStringProperty("");
+	private SimpleStringProperty description = new SimpleStringProperty("");
+//	private SimpleFloatProperty total_amount = new SimpleFloatProperty(0f);
+//	private SimpleFloatProperty sgst_amount = new SimpleFloatProperty(0f);
+//	private SimpleFloatProperty cgst_amount = new SimpleFloatProperty(0f);
+//	private SimpleFloatProperty igst_amount = new SimpleFloatProperty(0f);
+
 
 	private Product p; // extract the values of the product model
 
@@ -23,12 +29,22 @@ public class Order {
 		this.model.set(p.getModel());
 		this.imeiNumber.set(p.getImeiNumber());
 		// set the amount to rate * quantity
-		this.amount.set(this.rate.floatValue() * this.quantity.intValue());
+		//TODO individual gst or as a combined gst
+		this.amount.set(this.rate.getValue() * this.quantity.getValue());
+		this.description.set(getDescription());
 	}
 
 	public Order() {
 		p = new Product();
 	}
+
+
+
+
+	public void setDescription(String description) {
+		this.description.set(description);
+	}
+
 
 	public void setQuantity(int quantity){
 		this.quantity.set(quantity);
@@ -54,17 +70,11 @@ public class Order {
 		this.manufacturer.set(manufacturer);
 	}
 
-	public int getQuantity() {
-		return quantity.get();
-	}
-
 	public SimpleIntegerProperty quantityProperty() {
 		return quantity;
 	}
 
-	public float getRate() {
-		return rate.get();
-	}
+	public float getRate() { return rate.get(); }
 
 	public SimpleFloatProperty rateProperty() {
 		return rate;
@@ -116,6 +126,25 @@ public class Order {
 
 	public void setImeiNumber(String imeiNumber) {
 		this.imeiNumber.set(imeiNumber);
+	}
+
+	public int getQuantity(){
+		return quantity.get();
+	}
+
+	public String getRateStringValue(){
+		return String.valueOf(rate.get());
+	}
+
+	public String getDescription(){
+		StringBuilder str = new StringBuilder();
+		String[] numbers = imeiNumber.get().split(",");
+		for (int i = 1; i <=numbers.length ; i++) {
+			str.append("IMEI ").append(i).append(": ").append(numbers[i-1]).append("\n");
+		}
+		return manufacturer.get() + " " +
+				model.get() + "\n" +
+				"IMEI: "+imeiNumber.get() + "\n";
 	}
 
 	@Override

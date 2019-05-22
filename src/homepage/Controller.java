@@ -17,9 +17,7 @@ import javafx.scene.layout.*;
 import javafx.scene.transform.Scale;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import utils.Animations;
-import utils.PrintController;
-import utils.PrinterHelper;
+import utils.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -54,12 +52,26 @@ public class Controller implements Initializable {
 	private final KeyCombination printKeyCombination = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
 	private final KeyCombination clearKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
 
-	private Sale sale;
+
 
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-//		repository.loadProducts(); // load products from database
+
+		nameTextField.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+		addressTextField.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
 		invoiceTable.setItems(repository.getOrdersList()); // set the items for tableview
 		itemsList.setItems(repository.getProductList()); // set the items for listview (loaded from database)
 		itemsList.getSelectionModel().selectFirst();// set initial focus to product list
@@ -125,34 +137,6 @@ public class Controller implements Initializable {
 	private void closeProgram() {
 		repository.closeProgram();
 		System.exit(0);
-
-//		jasper();
-
-//		try {
-//			changePageTo(FXMLLoader.load(getClass().getResource("/utils/print.fxml")));
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-	}
-
-	private void jasper() {
-		try {
-
-			JasperReport jasperReport = null;
-			jasperReport = JasperCompileManager.compileReport("/Users/mithilesh/Desktop/Mobile Retail/src/res/report.jrxml");
-			List<Employee> modelList = new ArrayList<Employee>();
-			modelList.add(new Employee("1", "Akshay", "IT", "akshaysharma@gmail.com"));
-			modelList.add(new Employee("2", "Rahul", "IT", "rahulgupta@gmail.com"));
-			modelList.add(new Employee("3", "Dev", "IT", "dev@gmail.com"));
-			modelList.add(new Employee("4", "Ankit", "IT", "ankit@gmail.com"));
-			JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(modelList);
-			Map<String, Object> params = new HashMap<String, Object>();
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, dataSource);
-			String path = "D://demoReportOutput.pdf";
-			JasperExportManager.exportReportToPdfFile(jasperPrint, path);
-		} catch (JRException e) {
-			e.printStackTrace();
-		}
 	}
 
 
@@ -195,7 +179,7 @@ public class Controller implements Initializable {
 			isTextPresent(addressTextField) &&
 			isOrderPresent()){
 
-		if (showAlert()){
+//		if (showAlert()){
 			// save sale to database
 			addSaleToDatabase();
 			// print the order
@@ -204,7 +188,7 @@ public class Controller implements Initializable {
 
 			// clear the order
 			clearOrder();
-		}
+//		}
 	}else {
 		showErrorDialog();
 		if (!nameTextField.isFocused())nameTextField.requestFocus();
@@ -212,45 +196,6 @@ public class Controller implements Initializable {
 
 	}
 
-	private void printNode(BorderPane root) {
-		PrinterJob job = PrinterJob.createPrinterJob();
-		Printer printer = job.getPrinter();
-		PageLayout pageLayout = printer.createPageLayout(
-				Paper.A4,
-				PageOrientation.PORTRAIT,
-				Printer.MarginType.HARDWARE_MINIMUM);
-
-
-		double width = root.getWidth();
-		double height = root.getHeight();
-
-
-		PrintResolution resolution = job.getJobSettings().getPrintResolution();
-
-		width /= resolution.getFeedResolution();
-
-		height /= resolution.getCrossFeedResolution();
-
-		System.out.println("Width "+width);
-		System.out.println("Height "+height);
-
-
-		double scaleX = pageLayout.getPrintableWidth()/width/600;
-		double scaleY = pageLayout.getPrintableHeight()/height/600;
-
-		Scale scale = new Scale(scaleX, scaleY);
-
-		System.out.println("Scale "+scale);
-
-		root.getTransforms().add(scale);
-
-		boolean success = job.printPage(pageLayout, root);
-		if(success){
-			job.endJob();
-		}
-		root.getTransforms().remove(scale);
-
-	}
 
 	/**
 	 * add sale to database on confirming sale
@@ -262,6 +207,7 @@ public class Controller implements Initializable {
 		customer.setMobileNumber(phoneNumberTextField.getText());
 		customer.setAddress(addressTextField.getText());
 		List<Order> orderList = new ArrayList<>(invoiceTable.getItems());
+
 		Sale s =new Sale(
 				customer,
 				orderList,  // all the products in invoice table (order) in arraylist form
@@ -269,23 +215,10 @@ public class Controller implements Initializable {
 				paymentModeComboBox.getSelectionModel().getSelectedItem() // payment mode
 		);
 
-//		try {
-//			FXMLLoader loader = new FXMLLoader();
-//			loader.setLocation(getClass().getResource("/utils/print.fxml"));
-//			Node node = loader.load();
-//			PrintController controller = loader.getController();
-//			if (controller != null){
-//				controller.setSale(s);
-//				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//				alert.setGraphic(node);
-//				alert.showAndWait();
-//				printNode((BorderPane) alert.getGraphic());
-//			}else System.out.println("Controller not found");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		// print invoice
+		Report.printInvoice(s);
 
-
+		// add sale to database
 		repository.addSale(s);
 
 		// remove the products from inventory
@@ -294,6 +227,8 @@ public class Controller implements Initializable {
 		}
 
 	}
+
+
 
 	/**
 	 * show error dialog when all the customer details are not entered
@@ -403,7 +338,9 @@ public class Controller implements Initializable {
 	 */
 
 	private void addOrderToInvoice(){
-		repository.addOrder(new Order(itemsList.getSelectionModel().getSelectedItem()));
+		Order o = new Order(itemsList.getSelectionModel().getSelectedItem());
+		repository.addOrder(o);
+		itemsList.getItems().remove(itemsList.getSelectionModel().getSelectedItem());
 	}
 
 	/**
@@ -427,7 +364,9 @@ public class Controller implements Initializable {
 		KeyCode keyCode = keyEvent.getCode();
 		if (keyCode == KeyCode.BACK_SPACE){
 			// delete the order from invoice table
-			repository.removeOrder(invoiceTable.getSelectionModel().getSelectedItem());
+			Order o = invoiceTable.getSelectionModel().getSelectedItem();
+			repository.removeOrder(o);
+			itemsList.getItems().add(o.getP());
 		}else if (keyCode == KeyCode.LEFT){
 			// shift the focus to listview
 			if (!itemsList.isFocused()) itemsList.requestFocus();

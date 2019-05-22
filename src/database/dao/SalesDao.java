@@ -3,6 +3,7 @@ package database.dao;
 import  database.DatabaseHelper;
 import database.EntityInterface;
 import datamodel.Customer;
+import datamodel.Order;
 import datamodel.PaymentMode;
 import datamodel.Sale;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class SalesDao implements EntityInterface {
+
 
 	// table Columns
 	public enum COLUMNS{
@@ -30,7 +32,6 @@ public class SalesDao implements EntityInterface {
 	public static final String TABLE_NAME = "SALES";
 
 	private final String INSERT_QUERY = "INSERT INTO "+TABLE_NAME + " ( " +
-//			COLUMNS.ID.toString() + ", "+
 			COLUMNS.DATE.toString() + ", "+
 			COLUMNS.INVOICE_NUMBER.toString() + ", "+
 			COLUMNS.CUSTOMER_ID.toString() + ", "+
@@ -43,14 +44,13 @@ public class SalesDao implements EntityInterface {
 
 
 	private final String CREATE_TABLE_QUERY = "CREATE TABLE "+TABLE_NAME + " ( "+
-//			COLUMNS.ID.toString() + " varchar(255), "+
 			COLUMNS.DATE.toString() + " DATE, "+
 			COLUMNS.INVOICE_NUMBER.toString() + " INTEGER NOT NULL PRIMARY KEY,  "+
 			COLUMNS.CUSTOMER_ID.toString() + " varchar(255), "+
 			COLUMNS.NAME.toString() + " varchar(255), "+
 			COLUMNS.MOBILE_NUMBER.toString() + " varchar(255), "+
 			COLUMNS.ADDRESS.toString() + " varchar(255), "+
-			COLUMNS.PRODUCTS.toString() + " varchar(255), "+
+			COLUMNS.PRODUCTS.toString() + " LONG VARCHAR, "+
 			COLUMNS.PAYMENT_MODE.toString() + " varchar(255) " +
 			")";
 
@@ -120,9 +120,15 @@ public class SalesDao implements EntityInterface {
 	}
 
 
-	public void addSaleToDatabase(Sale s){
-		DatabaseHelper.executePreparedStatement(INSERT_QUERY,s);
+	public boolean addSaleToDatabase(Sale s){
+		return DatabaseHelper.executePreparedStatement(INSERT_QUERY,s);
 	}
+
+	public void removeSaleFromDatabase(Sale sale) {
+		String query = "DELETE FROM  "+TABLE_NAME +" WHERE "+COLUMNS.INVOICE_NUMBER+ " = (?)";
+		DatabaseHelper.executeQuery(query, String.valueOf(sale.getInvoiceNumber()));
+	}
+
 
 	/**
 	 * create table if does not exists

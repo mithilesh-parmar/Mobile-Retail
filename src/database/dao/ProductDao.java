@@ -37,7 +37,7 @@ public class ProductDao implements EntityInterface {
 			COLUMNS.ID.toString() +" varchar(255), "+
 			COLUMNS.MANUFACTURER.toString() + " varchar(255), "+
 			COLUMNS.MODEL.toString() + " varchar(255), "+
-			COLUMNS.IEMINUMBER.toString() + " varchar(255), "+
+			COLUMNS.IEMINUMBER.toString() + " LONG VARCHAR, "+
 			COLUMNS.RATE.toString() + " float(4)"+
 			")";
 
@@ -61,9 +61,9 @@ public class ProductDao implements EntityInterface {
 	 * @param product to be added to database
 	 */
 
-	public void addProductToDatabase(Product product){
+	public boolean addProductToDatabase(Product product){
 		String query = INSERT_QUERY + " VALUES (?,?,?,?,?)";
-		boolean result = DatabaseHelper.executePreparedStatement(query,product);
+		return DatabaseHelper.executePreparedStatement(query,product);
 	}
 
 	/**

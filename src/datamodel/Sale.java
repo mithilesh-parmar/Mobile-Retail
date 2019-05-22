@@ -18,7 +18,10 @@ public class Sale {
 	private SimpleStringProperty address = new SimpleStringProperty(); // customer address
 	private SimpleStringProperty products = new SimpleStringProperty(); // orderlist in string
 	private SimpleStringProperty paymentMode = new SimpleStringProperty(); // paymentmode
-
+	private SimpleFloatProperty total_amount = new SimpleFloatProperty(0f);
+	private SimpleFloatProperty sgst_amount = new SimpleFloatProperty(0f);
+	private SimpleFloatProperty cgst_amount = new SimpleFloatProperty(0f);
+	private SimpleFloatProperty igst_amount = new SimpleFloatProperty(0f);
 
 	// objects
 	private Customer customer; // customer
@@ -38,12 +41,14 @@ public class Sale {
 		this.name.set(customer.getName());
 		this.address.set(customer.getAddress());
 		this.mobileNumber.set(customer.getMobileNumber());
+		setUpAmounts();
 	}
 
 	public Sale() {
 		customer = new Customer();
 		organization = Organization.getInstance();
 		orderList = new ArrayList<>();
+		setUpAmounts();
 	}
 
 	public void setId(UUID id) {
@@ -55,6 +60,16 @@ public class Sale {
 	public Customer getCustomer() {
 		return customer;
 	}
+
+	private void setUpAmounts(){
+		sgst_amount.set((total_amount.getValue()*0.06f));
+		cgst_amount.set(total_amount.getValue()*0.06f);
+		igst_amount.set(total_amount.getValue()*0.12f);
+		total_amount.set(total_amount.getValue()+igst_amount.getValue());
+		//TODO setup amounts in sale and remove from order class
+
+	}
+
 
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
@@ -172,6 +187,42 @@ public class Sale {
 		return customer.getId();
 	}
 
+	public float getSgst_amount() {
+		return sgst_amount.get();
+	}
+
+	public SimpleFloatProperty sgst_amountProperty() {
+		return sgst_amount;
+	}
+
+	public void setSgst_amount(float sgst_amount) {
+		this.sgst_amount.set(sgst_amount);
+	}
+
+	public float getCgst_amount() {
+		return cgst_amount.get();
+	}
+
+	public SimpleFloatProperty cgst_amountProperty() {
+		return cgst_amount;
+	}
+
+	public void setCgst_amount(float cgst_amount) {
+		this.cgst_amount.set(cgst_amount);
+	}
+
+	public float getIgst_amount() {
+		return igst_amount.get();
+	}
+
+	public SimpleFloatProperty igst_amountProperty() {
+		return igst_amount;
+	}
+
+	public void setIgst_amount(float igst_amount) {
+		this.igst_amount.set(igst_amount);
+	}
+
 	/**
 	 * helper function which formats the products string passed to it
 	 * Manufacturer :
@@ -192,7 +243,7 @@ public class Sale {
 		for (int i = 0; i < lines.length; i++) {
 			Order order = new Order();
 			// all the properties of a product
-			String[] properties = lines[i].split(" ");
+			String[] properties = lines[i].split("&");
 
 			// set the manufacturer property
 			order.setManufacturer(properties[0]);
@@ -212,11 +263,28 @@ public class Sale {
 
 			// set the id of product
 			order.getP().setId(UUID.fromString(properties[4]));
+
+			// set the amount to rate as there is only one quantity
+			order.setAmount((Float.parseFloat(properties[3])));
+			// update the total amount (adding all amounts of each order)
+			total_amount.set(total_amount.getValue()+order.getAmount());
 			orders.add(order);
 		}
 		this.orderList = orders;
 		// set the products property to string of orders
 		this.products.set(stringBuilder.toString());
+	}
+
+	public float getTotal_amount() {
+		return total_amount.get();
+	}
+
+	public SimpleFloatProperty total_amountProperty() {
+		return total_amount;
+	}
+
+	public void setTotal_amount(float total_amount) {
+		this.total_amount.set(total_amount);
 	}
 
 	/**
@@ -226,10 +294,10 @@ public class Sale {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (Order o :orderList){
 			stringBuilder
-					.append(o.getManufacturer()).append(" ")
-					.append(o.getModel()).append(" ")
-					.append(o.getImeiNumber()).append(" ")
-					.append(o.getRate()).append(" ")
+					.append(o.getManufacturer()).append("&")
+					.append(o.getModel()).append("&")
+					.append(o.getImeiNumber()).append("&")
+					.append(o.getRate()).append("&")
 					.append(o.getP().getId()).append("\n");
 		}
 		return stringBuilder.toString();

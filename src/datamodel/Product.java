@@ -59,7 +59,13 @@ public class Product {
 	}
 
 	public String getImeiNumber() {
-		return imeiNumber.get();
+		String[] numbers = imeiNumber.get().split(",");
+
+		StringBuilder str = new StringBuilder();
+		for (int i = 1; i <= numbers.length; i++) {
+			str.append(numbers[i-1]).append(",");
+		}
+		return imeiNumber.getValue();
 	}
 
 	public SimpleStringProperty imeiNumberProperty() {
@@ -93,14 +99,6 @@ public class Product {
 	public void setRate(float rate) {
 		this.rate.set(rate);
 	}
-
-	public String getProductName(){
-		String name = manufacturer.getValue().toUpperCase() + model.getValue().toUpperCase();
-		name = name.replace(" ","");
-		System.out.println("Name "+name);
-		return name;
-	}
-
 
 
 	@Override

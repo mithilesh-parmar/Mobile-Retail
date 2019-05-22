@@ -119,7 +119,8 @@ public abstract class DatabaseHelper {
 			statement.setString(3,p.getModel());
 			statement.setString(4,p.getImeiNumber());
 			statement.setFloat(5,p.getRate());
-			result =  statement.execute();
+//			result =  statement.execute();
+			System.out.println(statement.executeUpdate());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally {
@@ -135,6 +136,7 @@ public abstract class DatabaseHelper {
 
 	public static boolean executePreparedStatement(String query, Sale s){
 		PreparedStatement statement = null;
+
 		boolean result  = false;
 		try{
 			connectDatabase();
@@ -162,7 +164,9 @@ public abstract class DatabaseHelper {
 			statement.setString(6,s.getAddress());
 			statement.setString(7,s.getProductsListAsString());
 			statement.setString(8,s.getPaymentMode());
+			//TODO some kind of error with id
 			result =  statement.execute();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}finally {

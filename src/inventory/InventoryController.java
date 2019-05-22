@@ -19,17 +19,57 @@ public class InventoryController implements Initializable {
 	public TextField modelTextField;
 	public TextField rateTextField;
 	public Button addButton;
-	public TextField iemiNumberTextField;
+
 	public TableColumn columnManufacturer;
 	public TableColumn columnModel;
 	public TableColumn columnIEMINumber;
 	public TableColumn columnRate;
-	public Label iemiLabel;
+
 	public GridPane inventoryItemInputGridPane;
+	public TextField iemiNumberTextField1;
+	public TextField iemiNumberTextField2;
+	public Label iemiLabel2;
 	private Repository repository = Repository.getInstance();
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+		iemiNumberTextField1.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+		iemiNumberTextField2.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+		manufacturerTextField.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+		modelTextField.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+		rateTextField.setTextFormatter(new TextFormatter<>(
+				(change -> {
+					change.setText(change.getText().toUpperCase());
+					return change;
+				})
+		));
+
+
 		inventoryTable.setItems(repository.getProductList()); // show all available products in table
 		addButton.setOnAction(event -> addProductToDatabase()); // add event handler
 		rateTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -37,6 +77,21 @@ public class InventoryController implements Initializable {
 				rateTextField.setText(newValue.replaceAll("[^\\d]", ""));
 			}
 		});
+
+		iemiNumberTextField2.setVisible(false);
+		iemiLabel2.setVisible(false);
+
+		iemiNumberTextField1.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue.length()>0 && !iemiNumberTextField2.isVisible()){
+				iemiNumberTextField2.setVisible(true);
+				iemiLabel2.setVisible(true);
+			}
+			else if (newValue.length() <=0 && iemiNumberTextField2.isVisible()){
+				iemiNumberTextField2.setVisible(false);
+				iemiLabel2.setVisible(true);
+			}
+		});
+
 	}
 
 
@@ -49,15 +104,19 @@ public class InventoryController implements Initializable {
 		if (isTextPresent(manufacturerTextField) &&
 				isTextPresent(modelTextField) &&
 				isTextPresent(rateTextField) &&
-				isTextPresent(iemiNumberTextField)){
+				(isTextPresent(iemiNumberTextField1)||isTextPresent(iemiNumberTextField2))){
 			String model = getText(modelTextField);
 			model = model.replace(" ","");
-			repository.addProductToInventory(new Product(
-					getText(manufacturerTextField),
+			String iemiText;
+			if (isTextPresent(iemiNumberTextField1) && isTextPresent(iemiNumberTextField2)){
+				iemiText = iemiNumberTextField1.getText()+","+iemiNumberTextField2.getText();
+			}else {
+				iemiText = isTextPresent(iemiNumberTextField1)? iemiNumberTextField1.getText():iemiNumberTextField2.getText();
+			}
+			repository.addProductToInventory(new Product(getText(manufacturerTextField),
 					model,
-					getText(iemiNumberTextField),
-					Float.parseFloat(getText(rateTextField))
-			));
+					iemiText,
+					Float.parseFloat(getText(rateTextField))));
 			clearTextFields();
 		}
 	}
@@ -95,7 +154,8 @@ public class InventoryController implements Initializable {
 		manufacturerTextField.clear();
 		modelTextField.clear();
 		rateTextField.clear();
-		iemiNumberTextField.clear();
+		if (isTextPresent(iemiNumberTextField1))iemiNumberTextField1.clear();
+		if (isTextPresent(iemiNumberTextField2))iemiNumberTextField2.clear();
 	}
 
 	/**
@@ -131,4 +191,10 @@ public class InventoryController implements Initializable {
 		return response.get() == ButtonType.OK ;
 	}
 
+	public void onImeiTextFieldKeyPressed(KeyEvent keyEvent) {
+		KeyCode keyCode = keyEvent.getCode();
+		if (keyCode.equals(KeyCode.ENTER)){
+			addProductToDatabase();
+		}
+	}
 }

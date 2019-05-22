@@ -10,7 +10,7 @@
            >
 
     <center>
-        <TableView fx:id="salesTable" >
+        <TableView fx:id="salesTable" onKeyPressed="#handleOnKeyPressedSalesTable">
 
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

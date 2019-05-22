@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.io.*;
 import java.util.Arrays;
 
 public class Repository {
@@ -27,6 +28,11 @@ public class Repository {
 	private FloatProperty totalAmount; // total amount of products
 	private FloatProperty totalPayableAmount; // total payable amount including gst
 	private IntegerProperty invoiceNumberProperty = new SimpleIntegerProperty(1); // invoice number
+	private final String INVOICE_FILE = "src/res/invoice_file.txt";
+	private File invoiceFile = new File(INVOICE_FILE);
+	private FileWriter writer;
+	private FileReader reader;
+
 
 	/**
 	 * Synchronized method for getting an instance
@@ -54,23 +60,23 @@ public class Repository {
 
 	public void loadSales(){
 		salesList.addAll(salesDao.loadSales());
-		invoiceNumberProperty.set(salesList.size() + 1); // set inital value of invoice number
+		invoiceNumberProperty.set(getInvoiceNumber());
 	}
 
 	/**
 	 * add a product to database
 	 * @param p
 	 */
-	public void saveProductToDatabase(Product p){
-		productDao.addProductToDatabase(p);
+	public boolean saveProductToDatabase(Product p){
+		return productDao.addProductToDatabase(p);
 	}
 
 	/**
 	 * sace sale item to database
 	 * @param s
 	 */
-	public void saveSaleToDatabase(Sale s){
-		salesDao.addSaleToDatabase(s);
+	public boolean saveSaleToDatabase(Sale s){
+		return salesDao.addSaleToDatabase(s);
 	}
 
 	/**
@@ -92,10 +98,21 @@ public class Repository {
 		totalPayableAmount = new SimpleFloatProperty(0);
 		productDao = new ProductDao();
 		salesDao = new SalesDao();
+
+
+		if (!invoiceFile.exists()) {
+			try {
+				 invoiceFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		loadSales();
 		loadProducts();
+
 		// add listener to invoice number
-		salesList.addListener((ListChangeListener<Sale>) c -> invoiceNumberProperty.set(salesList.size() + 1));
+//		salesList.addListener((ListChangeListener<Sale>) c -> invoiceNumberProperty.set(salesList.size() + 1));
 	}
 
 	/**
@@ -125,9 +142,49 @@ public class Repository {
 	 */
 	public void addSale(Sale s){
 		salesList.add(s);
-		saveSaleToDatabase(s);
+		saveInvoiceNumberToFile(s.getInvoiceNumber()+1);
+		invoiceNumberProperty.set(getInvoiceNumber());
+		System.out.println(saveSaleToDatabase(s));
 	}
 
+	public void saveInvoiceNumberToFile(int number){
+		try {
+			writer = new FileWriter(invoiceFile);
+			System.out.println("Writing to file: "+number);
+			writer.write(number);
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+			if (writer!=null) {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public int getInvoiceNumber(){
+		int n = -1;
+		if (invoiceFile.length()<=0)return 1;
+		try {
+
+			reader = new FileReader(invoiceFile);
+			n = reader.read();
+			System.out.println("Invoice Number "+n);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally {
+			try{
+				if (reader!=null)reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return n;
+	}
 	/**
 	 * remove product from database
 	 * called when product is removed from inventory table
@@ -252,5 +309,9 @@ public class Repository {
 	//TODO
 	public void closeProgram() {
 
+	}
+
+	public void removeSaleFromDatabase(Sale sale) {
+		salesDao.removeSaleFromDatabase(sale);
 	}
 }
